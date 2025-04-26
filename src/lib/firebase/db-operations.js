@@ -22,9 +22,9 @@ import { updateUserStats } from "./users";
 
 export async function createDocument(collectionName, data) {
   try {
-    if (collectionName === 'pastQuestions') {
-        validatePastQuestionData(data);
-      }
+    // if (collectionName === 'pastQuestions') {
+    //     validatePastQuestionData(data);
+    //   }
 
     const docRef = await addDoc(collection(db, collectionName), {
       ...data,

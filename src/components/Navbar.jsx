@@ -117,7 +117,7 @@ const Navigation = () => {
                   to="/past-questions"
                   className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md"
                 >
-                  Past-Questions
+                  View Questions
                 </Link>
                 <div className="flex items-center space-x-2">
                   {user.photoURL && (

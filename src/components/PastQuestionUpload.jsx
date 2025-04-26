@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { createDocument } from '../lib/firebase/db-operations';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage, auth } from '../lib/firebase/config';
@@ -9,9 +10,17 @@ function PastQuestionUpload({ onSubmit }) {
   const [course, setCourse] = useState('');
   const [year, setYear] = useState('');
   const [loading, setLoading] = useState(false);
+  // Removed unused currentUser variable
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Current User:', auth.currentUser);
+    if (!auth.currentUser) {
+      alert('You must be logged in to upload a past question.');
+      return;
+    }
+    
     if (!file || !title || !course || !year) {
       alert('Please fill all fields');
       return;
@@ -96,6 +105,10 @@ function PastQuestionUpload({ onSubmit }) {
     </div>
   );
 }
+PastQuestionUpload.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
 
 export default PastQuestionUpload;
+
 
