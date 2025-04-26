@@ -203,7 +203,7 @@ function Dashboard() {
       <h1 className="text-3xl font-bold">My Dashboard</h1>
       <button
         onClick={toggleModal}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
       >
         Upload New Past Question
       </button>
