@@ -56,7 +56,7 @@ function PastQuestions() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">All Past Questions</h1>
+      <h1 className="text-3xl font-bold mb-6">All Questions</h1>
       <FilterBar filters={filters} onFilterChange={handleFilterChange} onApplyFilters={applyFilters} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {pastQuestions.map((question) => (

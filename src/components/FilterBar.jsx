@@ -258,6 +258,7 @@
 
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FiFilter } from 'react-icons/fi';
 
 const FilterBar = ({ filters, onFilterChange, onApplyFilters }) => {
@@ -315,6 +316,14 @@ const FilterBar = ({ filters, onFilterChange, onApplyFilters }) => {
       </div>
     </div>
   );
+};
+FilterBar.propTypes = {
+  filters: PropTypes.shape({
+    course: PropTypes.string,
+    year: PropTypes.string,
+  }).isRequired,
+  onFilterChange: PropTypes.func.isRequired,
+  onApplyFilters: PropTypes.func.isRequired,
 };
 
 export default FilterBar;
