@@ -257,7 +257,7 @@
 
 
 
-import React from 'react';
+// import React from 'react';
 import PropTypes from 'prop-types';
 import { FiFilter } from 'react-icons/fi';
 
@@ -282,6 +282,7 @@ const FilterBar = ({ filters, onFilterChange, onApplyFilters }) => {
             </label>
             <input
               type="text"
+              name="course"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Enter course name"
               value={filters.course}
@@ -296,8 +297,9 @@ const FilterBar = ({ filters, onFilterChange, onApplyFilters }) => {
             </label>
             <input
               type="text"
+              name="year"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter year"
+              placeholder="Enter year"  
               value={filters.year}
               onChange={(e) => onFilterChange('year', e.target.value)}
             />

@@ -86,7 +86,7 @@ function PastQuestionUpload({ onSubmit }) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Image</label>
+          <label className="block text-sm font-medium text-gray-700">File</label>
           <input
             type="file"
             accept=".pdf,image/*"
