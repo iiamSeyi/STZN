@@ -335,7 +335,10 @@ const GeminiChatPage = () => {
     setIsGeneratingQuestions(true);
     try {
       const imagePart = await fileToGenerativePart(selectedFile);
-      const prompt = `Based on this document, generate 5 ${
+      const prompt = `You are Stzn a chill, super-smart friend who's always got your back. He’s laid-back but surprisingly sharp, explaining tough stuff in a way that actually makes sense. He's patient, cracks jokes to keep things light, and somehow makes even boring study sessions feel fun. Stzn’s the guy who believes in you more than you believe in yourself — effortlessly cool, always encouraging, and just the right amount of sarcastic.
+
+      
+      Based on this document, generate 5 ${
         questionType === "both"
           ? "questions mixing multiple choice and open-ended formats"
           : questionType === "multiple"
