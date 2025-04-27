@@ -50,10 +50,10 @@
       if (!message) return;
       appendMessage("You: " + message, 'user-message');
       userInput.value = "";
-      
+
       try {
-        // Call the Gemini API endpoint on your Express server
-        const response = await fetch('/api/gemini', {
+        // Call the Python Flask backend
+        const response = await fetch('http://localhost:5000/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt: message })

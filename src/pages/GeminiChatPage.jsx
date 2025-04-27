@@ -1,143 +1,8 @@
-// // pages/GeminiChatPage.jsx
-// import { useState, useRef, useEffect } from "react";
-// import { GoogleGenerativeAI } from "@google/generative-ai";
-// import { FiUpload, FiSend, FiImage } from "react-icons/fi";
-
-// async function fileToGenerativePart(file) {
-//   const base64EncodedDataPromise = new Promise((resolve) => {
-//     const reader = new FileReader();
-//     reader.onloadend = () => resolve(reader.result.split(",")[1]);
-//     reader.readAsDataURL(file);
-//   });
-
-//   return {
-//     inlineData: {
-//       data: await base64EncodedDataPromise,
-//       mimeType: file.type,
-//     },
-//   };
-// }
-
-// const GeminiChatPage = () => {
-//   const [messages, setMessages] = useState([]);
-//   const [input, setInput] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [selectedFile, setSelectedFile] = useState(null);
-//   const [filePreview, setFilePreview] = useState(null);
-//   const chatEndRef = useRef(null);
-//   const fileInputRef = useRef(null);
-
-//   // Initialize Gemini
-//   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-//   const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
-
-//   useEffect(() => {
-//     scrollToBottom();
-//   }, [messages]);
-
-//   const scrollToBottom = () => {
-//     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-//   };
-
-//   const handleFileSelect = async (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       if (file.type.startsWith("image/") || file.type === "application/pdf") {
-//         setSelectedFile(file);
-
-//         // Create preview for images
-//         if (file.type.startsWith("image/")) {
-//           const reader = new FileReader();
-//           reader.onloadend = () => {
-//             setFilePreview(reader.result);
-//           };
-//           reader.readAsDataURL(file);
-//         } else {
-//           setFilePreview("PDF Document");
-//         }
-
-//         // Add system message about the uploaded file
-//         setMessages((prev) => [
-//           ...prev,
-//           {
-//             role: "system",
-//             content: `File uploaded: ${file.name}`,
-//             type: "notification",
-//           },
-//         ]);
-//       } else {
-//         alert("Please upload an image or PDF file");
-//       }
-//     }
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!input.trim() && !selectedFile) return;
-
-//     const userMessage = input.trim();
-//     setInput("");
-//     setIsLoading(true);
-
-//     // Add user message to chat
-//     setMessages((prev) => [
-//       ...prev,
-//       {
-//         role: "user",
-//         content: userMessage,
-//         hasFile: !!selectedFile,
-//       },
-//     ]);
-
-//     try {
-//       let response;
-
-//       if (selectedFile) {
-//         // Handle file-based query
-//         const imagePart = await fileToGenerativePart(selectedFile);
-//         const result = await model.generateContent([
-//           userMessage || "Analyze this document and provide key insights",
-//           imagePart,
-//         ]);
-//         response = await result.response;
-//       } else {
-//         // Handle text-only query
-//         const textModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-//         const result = await textModel.generateContent(userMessage);
-//         response = await result.response;
-//       }
-
-//       // Add AI response to chat
-//       setMessages((prev) => [
-//         ...prev,
-//         {
-//           role: "assistant",
-//           content: response.text(),
-//         },
-//       ]);
-
-//       // Clear file after processing
-//       setSelectedFile(null);
-//       setFilePreview(null);
-//     } catch (error) {
-//       console.error("Error generating response:", error);
-//       setMessages((prev) => [
-//         ...prev,
-//         {
-//           role: "assistant",
-//           content: "Sorry, I encountered an error. Please try again.",
-//           error: true,
-//         },
-//       ]);
-//     }
-
-//     setIsLoading(false);
-//   };
-
-// pages/GeminiChatPage.jsx
 import { useState, useRef, useEffect } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { FiUpload, FiSend, FiImage } from "react-icons/fi";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 async function fileToGenerativePart(file) {
   const base64EncodedDataPromise = new Promise((resolve) => {
@@ -145,7 +10,6 @@ async function fileToGenerativePart(file) {
     reader.onloadend = () => resolve(reader.result.split(",")[1]);
     reader.readAsDataURL(file);
   });
-
   return {
     inlineData: {
       data: await base64EncodedDataPromise,
@@ -160,53 +24,35 @@ const GeminiChatPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
+  const [copied, setCopied] = useState(false);
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Initialize Gemini
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-
-  // Update model selection
   const visionModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   const textModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
   useEffect(() => {
-    scrollToBottom();
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleFileSelect = async (e) => {
+  const handleFileSelect = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.type.startsWith("image/") || file.type === "application/pdf") {
-        setSelectedFile(file);
-
-        // Create preview for images
-        if (file.type.startsWith("image/")) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setFilePreview(reader.result);
-          };
-          reader.readAsDataURL(file);
-        } else {
-          setFilePreview("PDF Document");
-        }
-
-        // Add system message about the uploaded file
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "system",
-            content: `File uploaded: ${file.name}`,
-            type: "notification",
-          },
-        ]);
+    if (file && (file.type.startsWith("image/") || file.type === "application/pdf")) {
+      setSelectedFile(file);
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => setFilePreview(reader.result);
+        reader.readAsDataURL(file);
       } else {
-        alert("Please upload an image or PDF file");
+        setFilePreview("PDF Document");
       }
+      setMessages((prev) => [
+        ...prev,
+        { role: "system", content: `File uploaded: ${file.name}`, type: "notification" },
+      ]);
+    } else {
+      alert("Please upload an image or PDF file");
     }
   };
 
@@ -214,68 +60,42 @@ const GeminiChatPage = () => {
     e.preventDefault();
     if (!input.trim() && !selectedFile) return;
 
-    const userMessage = input.trim();
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: input.trim(), hasFile: !!selectedFile },
+    ]);
     setInput("");
     setIsLoading(true);
 
-    // Add user message to chat
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "user",
-        content: userMessage,
-        hasFile: !!selectedFile,
-      },
-    ]);
-
     try {
       let response;
-
       if (selectedFile) {
-        try {
-          // Handle file-based query using gemini-1.5-flash
-          const imagePart = await fileToGenerativePart(selectedFile);
-          const result = await visionModel.generateContent([
-            userMessage || "Analyze this document and provide key insights",
-            imagePart,
-          ]);
-          response = await result.response;
-        } catch (fileError) {
-          console.error("Error processing file:", fileError);
-          throw new Error("Failed to process the uploaded file");
-        }
+        const imagePart = await fileToGenerativePart(selectedFile);
+        const result = await visionModel.generateContent([
+          input.trim() || "Analyze this document and provide key insights",
+          imagePart,
+        ]);
+        response = await result.response;
       } else {
-        // Handle text-only query using gemini-1.5-pro
-        const result = await textModel.generateContent(userMessage);
+        const result = await textModel.generateContent(input.trim());
         response = await result.response;
       }
-
-      // Add AI response to chat
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: response.text(),
-        },
+        { role: "assistant", content: response.text() },
       ]);
-
-      // Clear file after processing
       setSelectedFile(null);
       setFilePreview(null);
     } catch (error) {
-      console.error("Error generating response:", error);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: `Error: ${
-            error.message || "Something went wrong. Please try again."
-          }`,
+          content: `Error: ${error.message || "Something went wrong."}`,
           error: true,
         },
       ]);
     }
-
     setIsLoading(false);
   };
 
@@ -283,7 +103,8 @@ const GeminiChatPage = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Chat Header */}
+
+          {/* Header */}
           <div className="p-4 bg-blue-500 text-white">
             <h1 className="text-xl font-semibold">Chat with Gemini AI</h1>
             <p className="text-sm opacity-90">
@@ -293,51 +114,79 @@ const GeminiChatPage = () => {
 
           {/* Chat Messages */}
           <div className="h-[600px] overflow-y-auto p-4 space-y-4">
-            {messages.map((message, index) => (
+            {messages.map((msg, i) => (
               <div
-                key={index}
+                key={i}
                 className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
+                  msg.role === "user"
+                    ? "justify-end"
+                    : "justify-start items-start"
                 }`}
               >
-                {message.type === "notification" ? (
-                  <div className="bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm">
-                    {message.content}
-                  </div>
-                ) : (
-                  <div
-                    className={`max-w-[80%] p-4 rounded-lg ${
-                      message.role === "user"
-                        ? "bg-blue-500 text-white"
-                        : message.error
-                        ? "bg-red-100 text-red-700"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {message.hasFile && (
-                      <div className="mb-2">
-                        <FiImage className="inline mr-2" />
-                        <span className="text-sm opacity-75">
-                          File attached
-                        </span>
-                      </div>
-                    )}
-                    <div className="prose prose-sm">{message.content}</div>
-                  </div>
-                )}
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-100 p-4 rounded-lg">
-                  <div className="animate-pulse flex space-x-2">
-                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
-                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
-                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                <div
+                  className={`max-w-[80%] p-4 rounded-lg ${
+                    msg.role === "user"
+                      ? "bg-blue-500 text-white text-right"
+                      : "bg-gray-100 text-gray-800 text-left"
+                  }`}
+                >
+                  {msg.hasFile && (
+                    <div className="mb-2 flex items-center text-sm opacity-75">
+                      <FiImage className="inline mr-2" /> File attached
+                    </div>
+                  )}
+
+                  {/* Markdown with copy-to-clipboard for code blocks */}
+                  <div className="prose prose-sm space-y-4">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        code: ({ node, inline, children, ...props }) => {
+                          const codeText = String(children).trim();
+                          if (!inline) {
+                            return (
+                              <div className="relative">
+                                <pre className="p-4 bg-gray-900 text-white rounded overflow-auto">
+                                  <code {...props}>{children}</code>
+                                </pre>
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(codeText);
+                                    setCopied(true);
+                                    setTimeout(() => setCopied(false), 2000);
+                                  }}
+                                  className="absolute top-2 right-2 opacity-60 hover:opacity-100 bg-gray-700 text-sm text-white px-2 py-1 rounded z-10 transition-opacity"
+                                >
+                                  {copied ? "Copied!" : "Copy"}
+                                </button>
+                              </div>
+                            );
+                          }
+                          return (
+                            <code className="bg-gray-200 px-1 rounded" {...props}>
+                              {children}
+                            </code>
+                          );
+                        },
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
                   </div>
                 </div>
               </div>
+            ))}
+
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 p-4 rounded-lg animate-pulse space-x-1 flex">
+                  <span className="h-2 w-2 bg-gray-400 rounded-full" />
+                  <span className="h-2 w-2 bg-gray-400 rounded-full" />
+                  <span className="h-2 w-2 bg-gray-400 rounded-full" />
+                </div>
+              </div>
             )}
+
             <div ref={chatEndRef} />
           </div>
 
@@ -346,8 +195,7 @@ const GeminiChatPage = () => {
             <div className="p-4 border-t border-gray-200">
               <div className="flex items-center space-x-2">
                 <div className="flex-shrink-0">
-                  {typeof filePreview === "string" &&
-                  filePreview === "PDF Document" ? (
+                  {filePreview === "PDF Document" ? (
                     <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center">
                       PDF
                     </div>
@@ -375,7 +223,7 @@ const GeminiChatPage = () => {
             </div>
           )}
 
-          {/* Chat Input */}
+          {/* Input Area */}
           <div className="p-4 border-t border-gray-200">
             <form onSubmit={handleSubmit} className="flex space-x-4">
               <button
