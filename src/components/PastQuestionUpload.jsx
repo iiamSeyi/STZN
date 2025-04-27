@@ -21,33 +21,21 @@ function PastQuestionUpload({ onSubmit }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      file: e.target.files[0],
-    }));
+    setFormData((prev) => ({ ...prev, file: e.target.files[0] }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Current User:", auth.currentUser);
     if (!auth.currentUser) {
       alert("You must be logged in to upload a past question.");
       return;
     }
 
-    if (
-      !formData.file ||
-      !formData.title ||
-      !formData.course ||
-      !formData.year
-    ) {
+    if (!formData.file || !formData.title || !formData.course || !formData.year) {
       alert("Please fill all fields");
       return;
     }
@@ -72,12 +60,7 @@ function PastQuestionUpload({ onSubmit }) {
 
       await createDocument("pastQuestions", pastQuestionData);
       onSubmit();
-      setFormData({
-        title: "",
-        course: "",
-        year: "",
-        file: null,
-      });
+      setFormData({ title: "", course: "", year: "", file: null });
     } catch (error) {
       console.error("Error uploading past question:", error);
       alert("Error uploading past question. Please try again.");
@@ -86,10 +69,10 @@ function PastQuestionUpload({ onSubmit }) {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+    <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
             Title
           </label>
           <input
@@ -98,13 +81,13 @@ function PastQuestionUpload({ onSubmit }) {
             required
             value={formData.title}
             onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
             placeholder="Enter title"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
             Course Name
           </label>
           <input
@@ -113,13 +96,13 @@ function PastQuestionUpload({ onSubmit }) {
             required
             value={formData.course}
             onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
             placeholder="Enter course name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
             Year
           </label>
           <select
@@ -127,7 +110,7 @@ function PastQuestionUpload({ onSubmit }) {
             required
             value={formData.year}
             onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 bg-white dark:bg-gray-700 dark:border-gray-600"
           >
             <option value="">Select Year</option>
             {years.map((year) => (
@@ -139,19 +122,14 @@ function PastQuestionUpload({ onSubmit }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
             File
           </label>
           <input
             type="file"
             required
             onChange={handleFileChange}
-            className="mt-1 block w-full text-sm text-gray-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0
-              file:text-sm file:font-semibold
-              file:bg-blue-50 file:text-blue-700
-              hover:file:bg-blue-100"
+            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 bg-white dark:bg-gray-700"
             accept=".pdf,.jpg,.jpeg,.png"
           />
         </div>
@@ -159,7 +137,7 @@ function PastQuestionUpload({ onSubmit }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white py-2 px-4 rounded-md hover:from-purple-600 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
         >
           {loading ? "Uploading..." : "Upload Past Question"}
         </button>

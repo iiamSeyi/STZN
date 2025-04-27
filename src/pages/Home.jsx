@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { auth } from '../lib/firebase/config';;
+import { auth } from '../lib/firebase/config';
 import { 
   signInWithPopup, 
   GoogleAuthProvider,
@@ -28,41 +28,6 @@ function Home() {
     }
   };
 
-//   return (
-//     <div className="text-center">
-//       <h1 className="text-4xl font-bold mb-8">Welcome to EcoFlow</h1>
-//       <p className="text-xl mb-8">
-//         Store your debate flows digitally and help save the environment!
-//       </p>
-//       {!user && (
-//         <button
-//           onClick={loginWithGoogle}
-//           className="bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600"
-//         >
-//           Get Started
-//         </button> 
-//       )}
-//       <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-//         <FeatureCard
-//           title="Digital Storage"
-//           description="Upload and organize your debate flows in one secure location"
-//         />
-//         <FeatureCard
-//           title="Easy Access"
-//           description="Access your flows anytime, anywhere, from any device"
-//         />
-//         <FeatureCard
-//           title="Environmental Impact"
-//           description="Track your contribution to saving trees and reducing paper waste"
-//         />
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
 return (
   <div
     className="text-center min-h-screen flex flex-col items-center justify-center text-white rounded-lg"
@@ -80,7 +45,7 @@ return (
     {!user && (
       <button
         onClick={loginWithGoogle}
-        className="bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600"
+        className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-3 rounded-lg text-lg hover:from-purple-700 hover:to-purple-900 transition-colors"
       >
         Get Started
       </button>
@@ -103,11 +68,10 @@ return (
 );
 }
 
-
 function FeatureCard({ title, description }) {
   return (
-    <div className="bg-gray-200 rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105">
-      <h3 className="text-xl font-semibold mb-2 text-blue-600">{title}</h3>
+    <div className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105">
+      <h3 className="text-xl font-semibold mb-2 bg-gradient-to-r from-purple-500 to-purple-700 text-white inline-block px-2 py-1 rounded">{title}</h3>
       <p className="text-gray-700">{description}</p>
     </div>
   );

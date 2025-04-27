@@ -3,38 +3,19 @@ import React, { useEffect, useState } from 'react';
 
 const ImageViewerModal = ({ imageUrl, onClose }) => {
   const [scale, setScale] = useState(1);
-  
-//   const handleZoomIn = () => {
-//     setScale(prev => Math.min(prev + 0.25, 3));
-//   };
 
-//   const handleZoomOut = () => {
-//     setScale(prev => Math.max(prev - 0.25, 0.5));
-//   };
-
-// Zoom functions with console logs for debugging
   const handleZoomIn = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
-    setScale(prevScale => {
-      const newScale = Math.min(prevScale + 0.25, 3);
-      console.log('Zooming in:', newScale);
-      return newScale;
-    });
+    e.stopPropagation();
+    setScale((prevScale) => Math.min(prevScale + 0.25, 3));
   };
 
   const handleZoomOut = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
-    setScale(prevScale => {
-      const newScale = Math.max(prevScale - 0.25, 0.5);
-      console.log('Zooming out:', newScale);
-      return newScale;
-    });
+    e.stopPropagation();
+    setScale((prevScale) => Math.max(prevScale - 0.25, 0.5));
   };
 
-  // Handle close with console log
   const handleClose = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
-    console.log('Closing modal');
+    e.stopPropagation();
     onClose();
   };
 
@@ -58,50 +39,29 @@ const ImageViewerModal = ({ imageUrl, onClose }) => {
         className="relative max-w-4xl w-full mx-4"
         onClick={e => e.stopPropagation()}
       >
-        {/* <div className="absolute top-4 right-4 flex gap-2">
-          <button
-            type="button"
-            onClick={handleZoomIn}
-            className="text-white bg-black bg-opacity-50 w-8 h-8 flex items-center justify-center rounded-full hover:bg-opacity-75"
-          >
-            +
-          </button>
-          <button
-            onClick={handleZoomOut}
-            className="text-white bg-black bg-opacity-50 w-8 h-8 flex items-center justify-center rounded-full hover:bg-opacity-75"
-          >
-            -
-          </button>
-          <button
-            onClick={onClose}
-            className="text-white bg-black bg-opacity-50 w-8 h-8 flex items-center justify-center rounded-full hover:bg-opacity-75"
-          >
-            ×
-          </button> */}
-
-          {/* Control buttons */}
+        {/* Control Buttons with consistent purple themed UI */}
         <div className="absolute top-4 right-4 flex gap-2 z-50">
           <button
             type="button"
             onClick={handleZoomIn}
-            className="text-white bg-black bg-opacity-50 w-10 h-10 flex items-center justify-center rounded-full hover:bg-opacity-75 focus:outline-none"
+            className="text-white bg-gradient-to-r from-purple-500 to-purple-700 w-10 h-10 flex items-center justify-center rounded-full hover:from-purple-600 hover:to-purple-800 focus:outline-none transition-colors"
           >
             <span className="text-2xl">+</span>
           </button>
           <button
             type="button"
             onClick={handleZoomOut}
-            className="text-white bg-black bg-opacity-50 w-10 h-10 flex items-center justify-center rounded-full hover:bg-opacity-75 focus:outline-none"
+            className="text-white bg-gradient-to-r from-purple-500 to-purple-700 w-10 h-10 flex items-center justify-center rounded-full hover:from-purple-600 hover:to-purple-800 focus:outline-none transition-colors"
           >
             <span className="text-2xl">-</span>
           </button>
           <button
             type="button"
             onClick={handleClose}
-            className="text-white bg-black bg-opacity-50 w-10 h-10 flex items-center justify-center rounded-full hover:bg-opacity-75 focus:outline-none"
+            className="text-white bg-gradient-to-r from-purple-500 to-purple-700 w-10 h-10 flex items-center justify-center rounded-full hover:from-purple-600 hover:to-purple-800 focus:outline-none transition-colors"
           >
             <span className="text-2xl">×</span>
-          </button> 
+          </button>
         </div>
         <div className="overflow-auto">
           <img
@@ -109,8 +69,8 @@ const ImageViewerModal = ({ imageUrl, onClose }) => {
             alt="Flow"
             className="w-full h-auto max-h-[90vh] object-contain transition-transform duration-200"
             style={{ 
-                transform: `scale(${scale})`, 
-                transformOrigin: 'center center'
+              transform: `scale(${scale})`, 
+              transformOrigin: 'center center'
             }}
             loading="lazy"
           />

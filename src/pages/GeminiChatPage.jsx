@@ -502,11 +502,11 @@ const GeminiChatPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-colors">
           {/* Chat Header */}
-          <div className="p-4 bg-blue-500 text-white">
+          <div className="p-4 bg-gradient-to-r from-purple-500 to-purple-700 dark:from-purple-600 dark:to-purple-800 text-white">
             <div className="flex flex-col gap-2">
               {/* Title and Description */}
               <div>
@@ -520,7 +520,7 @@ const GeminiChatPage = () => {
                 <select
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="mt-2 w-fit text-sm border rounded-lg p-1 text-gray-800"
+                  className="mt-2 w-fit text-sm border rounded-lg p-1 text-gray-800 dark:text-gray-200 dark:bg-gray-700 dark:border-gray-600"
                 >
                   <option value="en-US">English (US)</option>
                   <option value="en-GB">English (UK)</option>
@@ -554,22 +554,21 @@ const GeminiChatPage = () => {
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
+                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`
+                }
               >
                 {message.type === "notification" ? (
-                  <div className="bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm">
+                  <div className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded-full text-sm">
                     {message.content}
                   </div>
                 ) : (
                   <div
                     className={`max-w-[80%] p-4 rounded-lg ${
                       message.role === "user"
-                        ? "bg-blue-500 text-white"
+                        ? "bg-gradient-to-r from-purple-500 to-purple-700 dark:from-purple-600 dark:to-purple-800 text-white"
                         : message.error
-                        ? "bg-red-100 text-red-700"
-                        : "bg-gray-100 text-gray-800"
+                        ? "bg-red-100 dark:bg-red-800 dark:text-red-200"
+                        : "bg-gray-100 dark:bg-gray-800 dark:text-gray-200"
                     }`}
                   >
                     {message.hasFile && (
@@ -622,7 +621,7 @@ const GeminiChatPage = () => {
                       {message.role === "assistant" && !message.error && (
                         <button
                           onClick={() => speakText(message.content)}
-                          className="ml-2 text-sm text-blue-500 hover:text-blue-700"
+                          className="ml-2 text-sm text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                         >
                           {isSpeaking ? <FiVolumeX /> : <FiVolume2 />}
                         </button>
@@ -634,7 +633,7 @@ const GeminiChatPage = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 p-4 rounded-lg">
+                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
                   <div className="animate-pulse flex space-x-2">
                     <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
                     <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
@@ -648,13 +647,13 @@ const GeminiChatPage = () => {
 
           {/* File Preview and Question Generation */}
           {filePreview && (
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className="flex-shrink-0">
                     {typeof filePreview === "string" &&
                     filePreview === "PDF Document" ? (
-                      <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center">
+                      <div className="w-10 h-10 bg-red-100 dark:bg-red-800 rounded flex items-center justify-center">
                         PDF
                       </div>
                     ) : (
@@ -666,14 +665,14 @@ const GeminiChatPage = () => {
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{selectedFile?.name}</p>
+                    <p className="text-sm font-medium dark:text-gray-200">{selectedFile?.name}</p>
                     <button
                       onClick={() => {
                         setSelectedFile(null);
                         setFilePreview(null);
                         setGeneratedQuestions([]);
                       }}
-                      className="text-xs text-red-500 hover:text-red-700"
+                      className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-500"
                     >
                       Remove
                     </button>
@@ -732,12 +731,12 @@ const GeminiChatPage = () => {
           )}
 
           {/* Chat Input */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <form onSubmit={handleSubmit} className="flex space-x-4">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex-shrink-0 p-2 text-gray-500 hover:text-blue-500 rounded-lg hover:bg-gray-100"
+                className="flex-shrink-0 p-2 text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 rounded-lg hover:bg-gradient-to-r hover:from-purple-500 hover:to-purple-700 dark:hover:from-purple-600 dark:hover:to-purple-800"
               >
                 <FiUpload size={20} />
               </button>
@@ -745,10 +744,10 @@ const GeminiChatPage = () => {
               <button
                 type="button"
                 onClick={toggleListening}
-                className={`flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 ${
+                className={`flex-shrink-0 p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-500 hover:to-purple-700 dark:hover:from-purple-600 dark:hover:to-purple-800 ${
                   isListening
                     ? "text-red-500 hover:text-red-600"
-                    : "text-gray-500 hover:text-blue-500"
+                    : "text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400"
                 }`}
                 title={
                   speechError ||
@@ -801,9 +800,13 @@ const GeminiChatPage = () => {
                 )}
                 {input && !isListening && (
                   <button
+                   
                     type="button"
+                   
                     onClick={() => setInput("")}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                   
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600"
+                  
                   >
                     <FiX size={16} />
                   </button>
@@ -820,7 +823,7 @@ const GeminiChatPage = () => {
             </form>
 
             {speechError && (
-              <p className="text-red-500 text-sm mt-2">Error: {speechError}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm mt-2">Error: {speechError}</p>
             )}
           </div>
         </div>
