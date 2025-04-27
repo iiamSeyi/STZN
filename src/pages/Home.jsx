@@ -37,9 +37,13 @@ return (
       backgroundPosition: "center",
     }}
   >
-    <h1 className="text-6xl font-bold mb-4">Welcome to PQ-ACE</h1>
-    <p className="text-2xl mb-4">Where Past Questions Meet Future Success.</p>
-    <p className="text-xl mb-8">
+    <h1 className="text-6xl font-bold mb-4 drop-shadow-lg" style={{ textShadow: "0 0 10px purple, 0 0 20px purple" }}>
+      Welcome to PQ-ACE
+    </h1>
+    <p className="text-2xl mb-4 drop-shadow-lg" style={{ textShadow: "0 0 10px purple, 0 0 20px purple" }}>
+      Where Past Questions Meet Future Success.
+    </p>
+    <p className="text-xl mb-8 drop-shadow-lg" style={{ textShadow: "0 0 10px purple, 0 0 20px purple" }}>
       A space where students can share resources to enhance their learning and prepare for exams, tests, and quizzes.
     </p>
     {!user && (
