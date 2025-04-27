@@ -8,6 +8,9 @@ export default [
   { ignores: ['dist'] },
   {
     files: ['**/*.{js,jsx}'],
+    env: {
+      node: true  // <-- This enables Node.js globals (like process)
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

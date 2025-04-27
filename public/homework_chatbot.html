@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homework Chatbot</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+      }
+      #chat-box {
+          max-height: 400px;
+          overflow-y: scroll;
+          margin-bottom: 20px;
+          padding: 10px;
+          border: 1px solid #ccc;
+      }
+      .message {
+          margin-bottom: 10px;
+      }
+      .user-message {
+          color: blue;
+      }
+      .ai-message {
+          color: green;
+      }
+  </style>
+</head>
+<body>
+  <div id="chat-box"></div>
+  <input type="text" id="user-input" placeholder="Type your message..." autofocus />
+  <button id="send-btn">Send</button>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    function appendMessage(message, className) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message ' + className;
+      messageDiv.innerText = message;
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+      appendMessage("You: " + message, 'user-message');
+      userInput.value = "";
+      
+      try {
+        // Call the Gemini API endpoint on your Express server
+        const response = await fetch('/api/gemini', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: message })
+        });
+        const data = await response.json();
+        appendMessage("Gemini Chatbot: " + data.answer, 'ai-message');
+      } catch (error) {
+        console.error("Error fetching response:", error);
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keyup', (event) => {
+      if (event.key === 'Enter') sendMessage();
+    });
+  </script>
+</body>
+</html>
