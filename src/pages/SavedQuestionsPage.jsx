@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import { FiX, FiArrowLeft, FiDownload, FiTrash2 } from "react-icons/fi";
 
 const QuestionCard = ({ question, index }) => (
-  <div className="bg-white p-4 rounded-lg shadow mb-2 hover:shadow-md transition-shadow">
+  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-2 hover:shadow-md transition-shadow">
     <div className="space-y-3">
       <div className="flex items-start">
-        <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-2 flex-shrink-0">
+        <span className="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-2 flex-shrink-0">
           {index + 1}
         </span>
         <div className="flex-1">
@@ -15,14 +15,16 @@ const QuestionCard = ({ question, index }) => (
             <span
               className={`text-xs px-2 py-1 rounded ${
                 question.type === "MC"
-                  ? "bg-blue-100 text-blue-800"
-                  : "bg-green-100 text-green-800"
+                  ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300"
+                  : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
               }`}
             >
               {question.type === "MC" ? "Multiple Choice" : "Open Ended"}
             </span>
           </div>
-          <p className="flex-1">{question.question || question}</p>
+          <p className="flex-1 text-gray-800 dark:text-gray-200">
+            {question.question || question}
+          </p>
         </div>
       </div>
       {question.options && (
@@ -32,8 +34,8 @@ const QuestionCard = ({ question, index }) => (
               key={optIndex}
               className={`p-2 rounded-lg ${
                 question.correctAnswer === option[0]
-                  ? "bg-green-100 border border-green-200"
-                  : "bg-gray-50"
+                  ? "bg-green-100 dark:bg-green-800 border border-green-200 dark:border-green-700"
+                  : "bg-gray-50 dark:bg-gray-700"
               }`}
             >
               {option}
@@ -43,7 +45,7 @@ const QuestionCard = ({ question, index }) => (
       )}
       {question.explanation && (
         <div className="ml-8 mt-2">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             <span className="font-medium">Explanation:</span>{" "}
             {question.explanation}
           </p>
@@ -51,7 +53,7 @@ const QuestionCard = ({ question, index }) => (
       )}
       {question.modelAnswer && (
         <div className="ml-8 mt-2">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             <span className="font-medium">Model Answer:</span>{" "}
             {question.modelAnswer}
           </p>
@@ -104,42 +106,48 @@ const SavedQuestionsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors">
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               to="/gemini-chat"
-              className="flex items-center gap-2 text-blue-500 hover:text-blue-600"
+              className="flex items-center gap-2 text-purple-500 dark:text-purple-400 hover:text-purple-600 dark:hover:text-purple-300"
             >
               <FiArrowLeft />
               <span>Back to Chat</span>
             </Link>
-            <h1 className="text-2xl font-semibold">Saved Questions</h1>
+            <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+              Saved Questions
+            </h1>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Question Sets Sidebar */}
           <div className="md:col-span-1 space-y-4">
-            <h2 className="font-medium text-lg mb-4">Question Sets</h2>
+            <h2 className="font-medium text-lg mb-4 text-gray-800 dark:text-gray-200">
+              Question Sets
+            </h2>
             {savedQuestions.map((set) => (
               <div
                 key={set.id}
                 className={`p-4 rounded-lg border cursor-pointer transition-all ${
                   selectedSet?.id === set.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-blue-300"
+                    ? "border-purple-500 bg-purple-50 dark:bg-purple-900"
+                    : "border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-500"
                 }`}
                 onClick={() => setSelectedSet(set)}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-medium">{set.document}</h3>
-                    <p className="text-sm text-gray-500">
+                    <h3 className="font-medium text-gray-800 dark:text-gray-200">
+                      {set.document}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {new Date(set.timestamp).toLocaleDateString()}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {set.questions.length} questions
                     </p>
                   </div>
@@ -149,7 +157,7 @@ const SavedQuestionsPage = () => {
                         e.stopPropagation();
                         exportQuestions(set);
                       }}
-                      className="text-gray-500 hover:text-blue-500"
+                      className="text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-300"
                       title="Export questions"
                     >
                       <FiDownload />
@@ -159,7 +167,7 @@ const SavedQuestionsPage = () => {
                         e.stopPropagation();
                         deleteSavedQuestions(set.id);
                       }}
-                      className="text-gray-500 hover:text-red-500"
+                      className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-300"
                       title="Delete questions"
                     >
                       <FiTrash2 />
@@ -169,7 +177,7 @@ const SavedQuestionsPage = () => {
               </div>
             ))}
             {savedQuestions.length === 0 && (
-              <p className="text-gray-500 text-center py-4">
+              <p className="text-gray-500 dark:text-gray-400 text-center py-4">
                 No saved questions yet
               </p>
             )}
@@ -178,12 +186,12 @@ const SavedQuestionsPage = () => {
           {/* Selected Question Set Display */}
           <div className="md:col-span-3">
             {selectedSet ? (
-              <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                     {selectedSet.document}
                   </h2>
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 dark:text-gray-400">
                     Created on{" "}
                     {new Date(selectedSet.timestamp).toLocaleDateString()}
                   </p>
@@ -196,8 +204,8 @@ const SavedQuestionsPage = () => {
                       onClick={() => setQuestionTypeFilter("all")}
                       className={`px-3 py-1 rounded ${
                         questionTypeFilter === "all"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200"
+                          ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white"
+                          : "bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
                       }`}
                     >
                       All Questions
@@ -206,8 +214,8 @@ const SavedQuestionsPage = () => {
                       onClick={() => setQuestionTypeFilter("MC")}
                       className={`px-3 py-1 rounded ${
                         questionTypeFilter === "MC"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200"
+                          ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white"
+                          : "bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
                       }`}
                     >
                       Multiple Choice
@@ -216,8 +224,8 @@ const SavedQuestionsPage = () => {
                       onClick={() => setQuestionTypeFilter("OE")}
                       className={`px-3 py-1 rounded ${
                         questionTypeFilter === "OE"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200"
+                          ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white"
+                          : "bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
                       }`}
                     >
                       Open Ended
@@ -242,7 +250,7 @@ const SavedQuestionsPage = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-lg p-6 text-center text-gray-500">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center text-gray-500 dark:text-gray-400">
                 Select a question set to view its contents
               </div>
             )}
