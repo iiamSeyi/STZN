@@ -1,77 +1,13 @@
-// import { NavLink } from 'react-router-dom';
-// import { useAuth } from '../contexts/AuthContext';
-
-// function Navbar() {
-//   const { isAuthenticated, user, logout } = useAuth();
-//   console.log(isAuthenticated);
-
-//   return (
-//     <nav className="bg-white shadow-md">
-//       <div className="container mx-auto px-4">
-//         <div className="flex justify-between items-center py-4">
-//           <NavLink to="/" className="text-xl font-bold text-blue-600">
-//             PQ-ACE
-//           </NavLink>
-
-//           {isAuthenticated ? (
-//             <div className="flex items-center space-x-4">
-//               <ul className="flex space-x-2">
-//                 <li>
-//                   <NavLink
-//                     to="/dashboard"
-//                     className={({ isActive }) =>
-//                       `px-4 py-2 rounded-md ${
-//                         isActive ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
-//                       }`
-//                     }
-//                   >
-//                     Dashboard
-//                   </NavLink>
-//                 </li>
-//                 <li>
-//                   <NavLink
-//                     to="/past-questions"
-//                     className={({ isActive }) =>
-//                       `px-4 py-2 rounded-md ${
-//                         isActive ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
-//                       }`
-//                     }
-//                   >
-//                     Past Questions
-//                   </NavLink>
-//                 </li>
-//               </ul>
-//               <button
-//                 onClick={logout}
-//                 className="px-4 py-2 text-red-600 hover:text-red-800"
-//               >
-//                 Logout
-//               </button>
-//             </div>
-//           ) : (
-//             <NavLink
-//               to="/"
-//               className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-//             >
-//               Login
-//             </NavLink>
-//           )}
-//         </div>
-//       </div>
-//     </nav>
-//   );
-// }
-
-// export default Navbar;
-
-// src/components/Navigation.jsx
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
 
 const Navigation = () => {
   const { user, logout, login } = useAuth();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
+  // Handle Google Sign-In
   const handleGoogleSignIn = async () => {
     try {
       await login();
@@ -81,6 +17,7 @@ const Navigation = () => {
     }
   };
 
+  // Handle Logout
   const handleLogout = async () => {
     try {
       await logout();
@@ -90,13 +27,21 @@ const Navigation = () => {
     }
   };
 
+  // Toggle the menu visibility
+  const toggleMenu = () => {
+    setMenuOpen((prev) => !prev);
+  };
+
   return (
     <nav className="bg-white shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <Link to="/" className="text-xl font-bold text-purple-600">
             PQ-ACE
           </Link>
+
+          {/* Navigation Links */}
           <div className="flex items-center space-x-4">
             <Link 
               to="/" 
@@ -104,22 +49,15 @@ const Navigation = () => {
             >
               Home
             </Link>
-            
+
+            {/* User Menu */}
             {user ? (
-              <>
-                <Link 
-                  to="/dashboard"
-                  className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md"
+              <div className="relative">
+                {/* User Icon */}
+                <div
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={toggleMenu}
                 >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/past-questions"
-                  className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md"
-                >
-                  View Questions
-                </Link>
-                <div className="flex items-center space-x-2">
                   {user.photoURL && (
                     <img 
                       src={user.photoURL} 
@@ -127,19 +65,34 @@ const Navigation = () => {
                       className="w-8 h-8 rounded-full"
                     />
                   )}
-                  <span>{user.displayName}</span>
                 </div>
 
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={handleLogout}
-                    className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </>
+                {/* Dropdown Menu */}
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
+                    <Link
+                      to="/dashboard"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/past-questions"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      View Questions
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
+              // Login Button
               <div className="flex space-x-3">
                 <button
                   onClick={handleGoogleSignIn}
@@ -152,12 +105,6 @@ const Navigation = () => {
                   />
                   Sign in with Google
                 </button>
-                {/* <Link 
-                  to="/login" 
-                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
-                >
-                  Login
-                </Link> */}
               </div>
             )}
           </div>
