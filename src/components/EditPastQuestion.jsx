@@ -47,7 +47,7 @@ const EditPastQuestion = ({ question, onUpdate, onCancel, isLoading }) => {
             name="title"
             value={editForm.title}
             onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
             required
           />
         </div>
@@ -60,7 +60,7 @@ const EditPastQuestion = ({ question, onUpdate, onCancel, isLoading }) => {
             name="course"
             value={editForm.course}
             onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
             required
           />
         </div>
@@ -73,7 +73,7 @@ const EditPastQuestion = ({ question, onUpdate, onCancel, isLoading }) => {
             name="year"
             value={editForm.year}
             onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
             required
           >
             <option value="">Select Year</option>
@@ -96,8 +96,8 @@ const EditPastQuestion = ({ question, onUpdate, onCancel, isLoading }) => {
               file:mr-4 file:py-2 file:px-4
               file:rounded-md file:border-0
               file:text-sm file:font-semibold
-              file:bg-blue-50 file:text-blue-700
-              hover:file:bg-blue-100"
+              file:bg-purple-50 file:text-purple-700
+              hover:file:bg-purple-100"
             accept=".pdf,.jpg,.jpeg,.png"
           />
         </div>
@@ -106,9 +106,11 @@ const EditPastQuestion = ({ question, onUpdate, onCancel, isLoading }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`px-4 py-2 rounded-md text-white
-              ${isLoading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}
-              transition-colors`}
+            className={`px-4 py-2 rounded-md text-white transition-colors ${
+              isLoading
+                ? "bg-gray-400"
+                : "bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-700 hover:to-purple-900"
+            }`}
           >
             {isLoading ? "Updating..." : "Save Changes"}
           </button>

@@ -101,8 +101,7 @@ const GeminiChatPage = () => {
     }
   };
   const stopListening = () => recognitionRef.current?.stop();
-  const toggleListening = () =>
-    isListening ? stopListening() : startListening();
+  const toggleListening = () => (isListening ? stopListening() : startListening());
 
   const speakText = (text) => {
     if (!("speechSynthesis" in window)) return;
@@ -127,7 +126,10 @@ const GeminiChatPage = () => {
       } else {
         setFilePreview("PDF Document");
       }
-      setMessages((m) => [...m, { role: "system", content: `File uploaded: ${file.name}`, type: "notification" }]);
+      setMessages((m) => [
+        ...m,
+        { role: "system", content: `File uploaded: ${file.name}`, type: "notification" },
+      ]);
     } else {
       alert("Please upload an image or PDF");
     }
@@ -160,17 +162,17 @@ const GeminiChatPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-colors">
           {/* Header */}
-          <div className="p-4 bg-blue-500 text-white">
+          <div className="p-4 bg-gradient-to-r from-purple-500 to-purple-700 dark:from-purple-600 dark:to-purple-800 text-white">
             <h1 className="text-xl font-semibold">Chat with Gemini AI</h1>
             <p className="text-sm opacity-90">Upload past questions or ask anything</p>
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="mt-2 p-1 text-sm border rounded-lg text-gray-800"
+              className="mt-2 p-1 text-sm border rounded-lg text-gray-800 dark:text-gray-200 dark:bg-gray-700 dark:border-gray-600"
             >
               <option value="en-US">English (US)</option>
               <option value="es-ES">Spanish</option>
@@ -183,22 +185,21 @@ const GeminiChatPage = () => {
             {messages.map((msg, i) => (
               <div
                 key={i}
-                className={`flex ${
-                  msg.role === "user" ? "justify-end" : "justify-start items-start"
-                }`}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start items-start"}`
+                }
               >
                 {msg.type === "notification" ? (
-                  <div className="bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm">
+                  <div className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded-full text-sm">
                     {msg.content}
                   </div>
                 ) : (
                   <div
                     className={`max-w-[80%] p-4 rounded-lg ${
                       msg.role === "user"
-                        ? "bg-blue-500 text-white text-right"
+                        ? "bg-gradient-to-r from-purple-500 to-purple-700 dark:from-purple-600 dark:to-purple-800 text-white text-right"
                         : msg.error
-                        ? "bg-red-100 text-red-700 text-left"
-                        : "bg-gray-100 text-gray-800 text-left"
+                        ? "bg-red-100 dark:bg-red-800 dark:text-red-200 text-left"
+                        : "bg-gray-100 dark:bg-gray-800 dark:text-gray-200 text-left"
                     }`}
                   >
                     {msg.hasFile && (
@@ -206,9 +207,7 @@ const GeminiChatPage = () => {
                         <FiImage className="inline mr-2" /> File attached
                       </div>
                     )}
-
-                    {/* Markdown wrapper with Tailwind typography */}
-                    <div className="prose prose-sm space-y-4">
+                    <div className="prose prose-sm dark:prose-invert space-y-4">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
@@ -233,18 +232,20 @@ const GeminiChatPage = () => {
                                 </div>
                               );
                             }
-                            return <code className="bg-gray-200 px-1 rounded" {...props}>{children}</code>;
+                            return (
+                              <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded" {...props}>
+                                {children}
+                              </code>
+                            );
                           },
                         }}
                       >
                         {msg.content}
                       </ReactMarkdown>
-
-                      {/* Speak button for assistant */}
                       {msg.role === "assistant" && !msg.error && (
                         <button
                           onClick={() => speakText(msg.content)}
-                          className="mt-2 text-sm text-blue-500 hover:text-blue-700"
+                          className="mt-2 text-sm text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                         >
                           {isSpeaking ? <FiVolumeX /> : <FiVolume2 />}
                         </button>
@@ -257,7 +258,7 @@ const GeminiChatPage = () => {
 
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 p-4 rounded-lg animate-pulse space-x-2 flex">
+                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg animate-pulse space-x-2 flex">
                   <div className="h-2 w-2 bg-gray-400 rounded-full" />
                   <div className="h-2 w-2 bg-gray-400 rounded-full" />
                   <div className="h-2 w-2 bg-gray-400 rounded-full" />
@@ -269,11 +270,11 @@ const GeminiChatPage = () => {
 
           {/* File preview */}
           {filePreview && (
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2">
                 <div className="flex-shrink-0">
                   {filePreview === "PDF Document" ? (
-                    <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center">
+                    <div className="w-10 h-10 bg-red-100 dark:bg-red-800 rounded flex items-center justify-center">
                       PDF
                     </div>
                   ) : (
@@ -281,13 +282,13 @@ const GeminiChatPage = () => {
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{selectedFile?.name}</p>
+                  <p className="text-sm font-medium dark:text-gray-200">{selectedFile?.name}</p>
                   <button
                     onClick={() => {
                       setSelectedFile(null);
                       setFilePreview(null);
                     }}
-                    className="text-xs text-red-500 hover:text-red-700"
+                    className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-500"
                   >
                     Remove
                   </button>
@@ -297,33 +298,49 @@ const GeminiChatPage = () => {
           )}
 
           {/* Input area */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <form onSubmit={handleSubmit} className="flex space-x-4">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 text-gray-500 hover:text-blue-500 rounded-lg hover:bg-gray-100"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 rounded-lg hover:bg-gradient-to-r hover:from-purple-500 hover:to-purple-700 dark:hover:from-purple-600 dark:hover:to-purple-800"
               >
                 <FiUpload size={20} />
               </button>
               <button
                 type="button"
                 onClick={toggleListening}
-                className={`p-2 rounded-lg hover:bg-gray-100 ${
-                  isListening ? "text-red-500 hover:text-red-600" : "text-gray-500 hover:text-blue-500"
+                className={`p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-500 hover:to-purple-700 dark:hover:from-purple-600 dark:hover:to-purple-800 ${
+                  isListening ? "text-red-500 hover:text-red-600" : "text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400"
                 }`}
                 title={speechError || (isListening ? "Stop listening" : "Start voice input")}
               >
                 {isListening ? <FiMicOff size={20} /> : <FiMic size={20} />}
               </button>
-              <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*,application/pdf" className="hidden" />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept="image/*,application/pdf"
+                className="hidden"
+              />
               <div className="flex-1 relative">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={isListening ? "Listening..." : selectedFile ? "Ask about file or press Enter" : "Type your message..."}
-                  className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${isListening ? "bg-red-50" : ""}`}
+                  placeholder={
+                    isListening
+                      ? "Listening..."
+                      : selectedFile
+                      ? "Ask about file or press Enter"
+                      : "Type your message..."
+                  }
+                  className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                    isListening
+                      ? "bg-red-50 dark:bg-red-600"
+                      : "bg-white dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                  }`}
                   disabled={isLoading}
                 />
                 {isListening && (
@@ -339,7 +356,11 @@ const GeminiChatPage = () => {
                   </div>
                 )}
                 {input && !isListening && (
-                  <button type="button" onClick={() => setInput("")} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <button
+                    type="button"
+                    onClick={() => setInput("")}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600"
+                  >
                     <FiX size={16} />
                   </button>
                 )}
@@ -347,12 +368,12 @@ const GeminiChatPage = () => {
               <button
                 type="submit"
                 disabled={isLoading || (!input.trim() && !selectedFile)}
-                className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="p-2 bg-gradient-to-r from-purple-500 to-purple-700 dark:from-purple-600 dark:to-purple-800 text-white rounded-lg hover:bg-purple-600 dark:hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 <FiSend size={20} />
               </button>
             </form>
-            {speechError && <p className="mt-2 text-red-500 text-sm">Error: {speechError}</p>}
+            {speechError && <p className="mt-2 text-red-500 dark:text-red-400 text-sm">Error: {speechError}</p>}
           </div>
         </div>
       </div>
