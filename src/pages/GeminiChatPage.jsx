@@ -14,6 +14,8 @@ import {
   FiX,
   FiSave,
 } from "react-icons/fi";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 async function fileToGenerativePart(file) {
   const base64EncodedDataPromise = new Promise((resolve) => {
@@ -579,18 +581,44 @@ const GeminiChatPage = () => {
                       </div>
                     )}
                     <div className="prose prose-sm">
-                      {message.type === "questions" ? (
-                        <div className="space-y-2">
-                          <h4 className="font-semibold">
-                            Generated Questions and Answers:
-                          </h4>
-                          <div className="whitespace-pre-wrap">
-                            {message.content}
-                          </div>
-                        </div>
-                      ) : (
-                        message.content
-                      )}
+                      <div className="w-full text-left">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            code: ({ node, inline, children, ...props }) => {
+                              const codeText = String(children).trim();
+                              if (!inline) {
+                                return (
+                                  <div className="relative">
+                                    <pre className="p-4 bg-gray-900 text-white rounded overflow-auto">
+                                      <code {...props}>{children}</code>
+                                    </pre>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(codeText);
+                                        alert("Code copied to clipboard!");
+                                      }}
+                                      className="absolute top-2 right-2 opacity-60 hover:opacity-100 bg-gray-700 text-sm text-white px-2 py-1 rounded z-10 transition-opacity"
+                                    >
+                                      Copy
+                                    </button>
+                                  </div>
+                                );
+                              }
+                              return (
+                                <code
+                                  className="bg-gray-200 dark:bg-gray-700 px-1 rounded"
+                                  {...props}
+                                >
+                                  {children}
+                                </code>
+                              );
+                            },
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
                       {message.role === "assistant" && !message.error && (
                         <button
                           onClick={() => speakText(message.content)}
