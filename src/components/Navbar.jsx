@@ -1,6 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useState } from "react";
+import { FiMessageSquare } from "react-icons/fi";
 
 const Navigation = () => {
   const { user, logout, login } = useAuth();
@@ -11,7 +12,7 @@ const Navigation = () => {
   const handleGoogleSignIn = async () => {
     try {
       await login();
-      navigate('/');
+      navigate("/");
     } catch (error) {
       console.error("Error signing in with Google:", error);
     }
@@ -21,7 +22,7 @@ const Navigation = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/');
+      navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -43,8 +44,8 @@ const Navigation = () => {
 
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md"
             >
               Home
@@ -59,9 +60,9 @@ const Navigation = () => {
                   onClick={toggleMenu}
                 >
                   {user.photoURL && (
-                    <img 
-                      src={user.photoURL} 
-                      alt="Profile" 
+                    <img
+                      src={user.photoURL}
+                      alt="Profile"
                       className="w-8 h-8 rounded-full"
                     />
                   )}
@@ -82,6 +83,13 @@ const Navigation = () => {
                     >
                       View Questions
                     </Link>
+                    <Link
+                      to="/gemini-chat"
+                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                    >
+                      <FiMessageSquare className="text-blue-500" />
+                      <span>Chat with AI</span>
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
@@ -98,9 +106,9 @@ const Navigation = () => {
                   onClick={handleGoogleSignIn}
                   className="flex items-center bg-white border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors"
                 >
-                  <img 
-                    src="https://www.google.com/favicon.ico" 
-                    alt="Google" 
+                  <img
+                    src="https://www.google.com/favicon.ico"
+                    alt="Google"
                     className="w-4 h-4 mr-2"
                   />
                   Sign in with Google
