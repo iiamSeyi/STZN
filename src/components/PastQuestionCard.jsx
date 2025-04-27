@@ -320,7 +320,8 @@ function PastQuestionCard({ question, onDelete, isOwner }) {
               </button>
               <button
                 onClick={handleDelete}
-                className="text-red-600 hover:text-red-800"
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-md
+                 bg-red-600 hover:bg-red-700 text-white transition-colors"
               >
                 Delete
               </button>
