@@ -97,6 +97,7 @@ export async function queryDocuments(
 
     // Add where clauses
     if (Array.isArray(conditions) && conditions.length > 0) {
+      console.log('Conditions:', conditions); // Debugging
       conditions.forEach((condition) => {
         if (condition?.field && condition?.operator && condition?.value !== undefined) {
           queryConstraints.push(where(condition.field, condition.operator, condition.value));
@@ -114,15 +115,20 @@ export async function queryDocuments(
       queryConstraints.push(limit(limitCount));
     }
 
+    console.log('Query Constraints:', queryConstraints); // Debugging
+
     // Construct final query
     const finalQuery = query(baseQuery, ...queryConstraints);
 
     // Execute query
     const querySnapshot = await getDocs(finalQuery);
-    return querySnapshot.docs.map((doc) => ({
+    const results = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+
+    console.log('Query Results:', results); // Debugging
+    return results;
   } catch (error) {
     console.error(`Error querying documents in ${collectionName}:`, error);
     throw error;

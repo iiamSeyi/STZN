@@ -1,4 +1,4 @@
-import { collection, addDoc, updateDoc, doc, deleteDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, deleteDoc, query, where, getDocs, orderBy, getDoc } from 'firebase/firestore';
 import { db } from './config';
 import { NotFoundError } from './errors';
 
@@ -117,7 +117,16 @@ export const getFilteredPastQuestions = async (userId, filters = {}) => {
         }
 
         const sortOptions = { field: 'uploadedAt', direction: 'desc' };
-        return await queryDocuments('pastQuestions', conditions, sortOptions);
+        const q = query(
+            collection(db, 'pastQuestions'),
+            ...conditions.map(cond => where(cond.field, cond.operator, cond.value)),
+            orderBy(sortOptions.field, sortOptions.direction)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
     } catch (error) {
         console.error('Error getting filtered past questions:', error);
         throw error;
