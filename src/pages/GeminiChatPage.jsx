@@ -1,143 +1,16 @@
-// // pages/GeminiChatPage.jsx
-// import { useState, useRef, useEffect } from "react";
-// import { GoogleGenerativeAI } from "@google/generative-ai";
-// import { FiUpload, FiSend, FiImage } from "react-icons/fi";
-
-// async function fileToGenerativePart(file) {
-//   const base64EncodedDataPromise = new Promise((resolve) => {
-//     const reader = new FileReader();
-//     reader.onloadend = () => resolve(reader.result.split(",")[1]);
-//     reader.readAsDataURL(file);
-//   });
-
-//   return {
-//     inlineData: {
-//       data: await base64EncodedDataPromise,
-//       mimeType: file.type,
-//     },
-//   };
-// }
-
-// const GeminiChatPage = () => {
-//   const [messages, setMessages] = useState([]);
-//   const [input, setInput] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [selectedFile, setSelectedFile] = useState(null);
-//   const [filePreview, setFilePreview] = useState(null);
-//   const chatEndRef = useRef(null);
-//   const fileInputRef = useRef(null);
-
-//   // Initialize Gemini
-//   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-//   const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
-
-//   useEffect(() => {
-//     scrollToBottom();
-//   }, [messages]);
-
-//   const scrollToBottom = () => {
-//     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-//   };
-
-//   const handleFileSelect = async (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       if (file.type.startsWith("image/") || file.type === "application/pdf") {
-//         setSelectedFile(file);
-
-//         // Create preview for images
-//         if (file.type.startsWith("image/")) {
-//           const reader = new FileReader();
-//           reader.onloadend = () => {
-//             setFilePreview(reader.result);
-//           };
-//           reader.readAsDataURL(file);
-//         } else {
-//           setFilePreview("PDF Document");
-//         }
-
-//         // Add system message about the uploaded file
-//         setMessages((prev) => [
-//           ...prev,
-//           {
-//             role: "system",
-//             content: `File uploaded: ${file.name}`,
-//             type: "notification",
-//           },
-//         ]);
-//       } else {
-//         alert("Please upload an image or PDF file");
-//       }
-//     }
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!input.trim() && !selectedFile) return;
-
-//     const userMessage = input.trim();
-//     setInput("");
-//     setIsLoading(true);
-
-//     // Add user message to chat
-//     setMessages((prev) => [
-//       ...prev,
-//       {
-//         role: "user",
-//         content: userMessage,
-//         hasFile: !!selectedFile,
-//       },
-//     ]);
-
-//     try {
-//       let response;
-
-//       if (selectedFile) {
-//         // Handle file-based query
-//         const imagePart = await fileToGenerativePart(selectedFile);
-//         const result = await model.generateContent([
-//           userMessage || "Analyze this document and provide key insights",
-//           imagePart,
-//         ]);
-//         response = await result.response;
-//       } else {
-//         // Handle text-only query
-//         const textModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-//         const result = await textModel.generateContent(userMessage);
-//         response = await result.response;
-//       }
-
-//       // Add AI response to chat
-//       setMessages((prev) => [
-//         ...prev,
-//         {
-//           role: "assistant",
-//           content: response.text(),
-//         },
-//       ]);
-
-//       // Clear file after processing
-//       setSelectedFile(null);
-//       setFilePreview(null);
-//     } catch (error) {
-//       console.error("Error generating response:", error);
-//       setMessages((prev) => [
-//         ...prev,
-//         {
-//           role: "assistant",
-//           content: "Sorry, I encountered an error. Please try again.",
-//           error: true,
-//         },
-//       ]);
-//     }
-
-//     setIsLoading(false);
-//   };
-
 // pages/GeminiChatPage.jsx
 import { useState, useRef, useEffect } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { FiUpload, FiSend, FiImage } from "react-icons/fi";
+import {
+  FiUpload,
+  FiSend,
+  FiImage,
+  FiMic,
+  FiMicOff,
+  FiVolume2,
+  FiVolumeX,
+  FiX,
+} from "react-icons/fi";
 
 async function fileToGenerativePart(file) {
   const base64EncodedDataPromise = new Promise((resolve) => {
@@ -160,8 +33,15 @@ const GeminiChatPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("en-US");
+
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const speechSynthesisRef = useRef(null);
 
   // Initialize Gemini
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
@@ -170,12 +50,164 @@ const GeminiChatPage = () => {
   const visionModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   const textModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
+  // Initialize speech recognition
+  useEffect(() => {
+    if ("webkitSpeechRecognition" in window) {
+      const SpeechRecognition = window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = selectedLanguage;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechError(null);
+        setInput(""); // Clear input when starting new recording
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setSpeechError(event.error);
+        setIsListening(false);
+
+        // Attempt to restart on certain errors
+        if (event.error === "network") {
+          setTimeout(() => {
+            if (recognitionRef.current) {
+              recognitionRef.current.start();
+            }
+          }, 1000);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map((result) => result[0])
+          .map((result) => result.transcript)
+          .join("");
+
+        setInput(transcript);
+
+        // If this is a final result, stop listening
+        if (event.results[0].isFinal) {
+          recognition.stop();
+        }
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      if (speechSynthesisRef.current) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [selectedLanguage]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+        // Optionally auto-submit after speech ends
+        // if (input.trim()) {
+        //   handleSubmit(new Event('submit'));
+        // }
+      };
+    }
+  }, [input]);
+
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const startListening = () => {
+    if (!recognitionRef.current) {
+      setSpeechError("Speech recognition is not supported in your browser");
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      if (recognitionRef.current && isListening) {
+        recognitionRef.current.stop();
+      }
+    }, 10000); // Stop after 10 seconds
+
+    try {
+      // Reset any previous state
+      setInput("");
+      setSpeechError(null);
+
+      recognitionRef.current.onend = () => {
+        clearTimeout(timeout);
+        setIsListening(false);
+      };
+
+      // Start new recording
+      recognitionRef.current.start();
+    } catch (error) {
+      console.error("Speech recognition error:", error);
+      setSpeechError("Failed to start speech recognition");
+      clearTimeout(timeout);
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  const speakText = (text) => {
+    if ("speechSynthesis" in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+
+      if (isSpeaking) {
+        setIsSpeaking(false);
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = (event) => {
+        console.error("Speech synthesis error:", event);
+        setIsSpeaking(false);
+      };
+
+      // Optional: Customize voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(
+        (voice) => voice.lang === selectedLanguage
+      );
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+
+      window.speechSynthesis.speak(utterance);
+      speechSynthesisRef.current = utterance;
+    }
   };
 
   const handleFileSelect = async (e) => {
@@ -289,6 +321,24 @@ const GeminiChatPage = () => {
             <p className="text-sm opacity-90">
               Upload past questions or ask anything about your studies
             </p>
+            {/* Language Selection */}
+            <select
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+              className="mt-2 text-sm border rounded-lg p-1 text-gray-800"
+            >
+              <option value="en-US">English (US)</option>
+              <option value="en-GB">English (UK)</option>
+              <option value="es-ES">Spanish</option>
+              <option value="fr-FR">French</option>
+              <option value="de-DE">German</option>
+              <option value="it-IT">Italian</option>
+              <option value="pt-BR">Portuguese</option>
+              <option value="hi-IN">Hindi</option>
+              <option value="ja-JP">Japanese</option>
+              <option value="ko-KR">Korean</option>
+              <option value="zh-CN">Chinese (Simplified)</option>
+            </select>
           </div>
 
           {/* Chat Messages */}
@@ -322,7 +372,17 @@ const GeminiChatPage = () => {
                         </span>
                       </div>
                     )}
-                    <div className="prose prose-sm">{message.content}</div>
+                    <div className="prose prose-sm">
+                      {message.content}
+                      {message.role === "assistant" && !message.error && (
+                        <button
+                          onClick={() => speakText(message.content)}
+                          className="ml-2 text-sm text-blue-500 hover:text-blue-700"
+                        >
+                          {isSpeaking ? <FiVolumeX /> : <FiVolume2 />}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -385,6 +445,24 @@ const GeminiChatPage = () => {
               >
                 <FiUpload size={20} />
               </button>
+
+              {/* Voice Input Button */}
+              <button
+                type="button"
+                onClick={toggleListening}
+                className={`flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 ${
+                  isListening
+                    ? "text-red-500 hover:text-red-600"
+                    : "text-gray-500 hover:text-blue-500"
+                }`}
+                title={
+                  speechError ||
+                  (isListening ? "Stop listening" : "Start voice input")
+                }
+              >
+                {isListening ? <FiMicOff size={20} /> : <FiMic size={20} />}
+              </button>
+
               <input
                 type="file"
                 ref={fileInputRef}
@@ -392,18 +470,51 @@ const GeminiChatPage = () => {
                 accept="image/*,application/pdf"
                 className="hidden"
               />
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={
-                  selectedFile
-                    ? "Ask about the uploaded file or press Enter to analyze"
-                    : "Type your message..."
-                }
-                className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={isLoading}
-              />
+
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={
+                    isListening
+                      ? "Listening..."
+                      : selectedFile
+                      ? "Ask about the uploaded file or press Enter to analyze"
+                      : "Type your message..."
+                  }
+                  className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isListening ? "bg-red-50" : ""
+                  }`}
+                  disabled={isLoading}
+                />
+                {isListening && (
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse delay-75" />
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse delay-150" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={stopListening}
+                      className="text-red-500 hover:text-red-700 p-1"
+                    >
+                      <FiX size={16} />
+                    </button>
+                  </div>
+                )}
+                {input && !isListening && (
+                  <button
+                    type="button"
+                    onClick={() => setInput("")}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <FiX size={16} />
+                  </button>
+                )}
+              </div>
+
               <button
                 type="submit"
                 disabled={isLoading || (!input.trim() && !selectedFile)}
@@ -412,6 +523,10 @@ const GeminiChatPage = () => {
                 <FiSend size={20} />
               </button>
             </form>
+
+            {speechError && (
+              <p className="text-red-500 text-sm mt-2">Error: {speechError}</p>
+            )}
           </div>
         </div>
       </div>
