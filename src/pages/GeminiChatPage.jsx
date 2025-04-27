@@ -747,9 +747,9 @@ const GeminiChatPage = () => {
                   onChange={(e) => setQuestionType(e.target.value)}
                   className="ml-2 text-sm border rounded-lg p-1 text-gray-800"
                 >
-                  <option value="both">Both Types</option>
-                  <option value="multiple">Multiple Choice Only</option>
-                  <option value="open">Open-Ended Only</option>
+                  <option value="multiple">Both Types</option>
+                  <option value="open">Multiple Choice Only</option>
+                  <option value="both">Open-Ended Only</option>
                 </select>
               </div>
             </div>
