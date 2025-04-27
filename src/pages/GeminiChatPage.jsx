@@ -73,55 +73,125 @@ async function fileToGenerativePart(file) {
 //     </div>
 //   );
 // };
+
+// const QuestionCard = ({ question, index }) => {
+//   // Parse the question text to separate question number from content
+//   const questionParts = question.question.split(":");
+//   const questionContent =
+//     questionParts.length > 1 ? questionParts[1].trim() : question.question;
+
+//   return (
+//     <div className="bg-white p-4 rounded-lg shadow mb-2 hover:shadow-md transition-shadow">
+//       <div className="space-y-3">
+//         <div className="flex items-start">
+//           <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-2 flex-shrink-0">
+//             {index + 1}
+//           </span>
+//           <p className="flex-1">{questionContent}</p>
+//         </div>
+
+//         {question.options && question.options.length > 0 && (
+//           <div className="ml-8 space-y-2">
+//             {question.options.map((option, optIndex) => (
+//               <div
+//                 key={optIndex}
+//                 className={`p-2 rounded-lg ${
+//                   question.correctAnswer === option[0]
+//                     ? "bg-green-100 border border-green-200"
+//                     : "bg-gray-50"
+//                 }`}
+//               >
+//                 {option}
+//               </div>
+//             ))}
+//           </div>
+//         )}
+
+//         {question.correctAnswer && (
+//           <div className="ml-8 mt-2">
+//             <p className="text-sm text-green-600 font-medium">
+//               Correct Answer: {question.correctAnswer}
+//             </p>
+//           </div>
+//         )}
+
+//         {question.explanation && (
+//           <div className="ml-8 mt-2">
+//             <p className="text-sm text-gray-600">
+//               <span className="font-medium">Explanation:</span>{" "}
+//               {question.explanation}
+//             </p>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
 const QuestionCard = ({ question, index }) => {
-  // Parse the question text to separate question number from content
-  const questionParts = question.question.split(":");
-  const questionContent =
-    questionParts.length > 1 ? questionParts[1].trim() : question.question;
+  const [showAnswer, setShowAnswer] = useState(false);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-2 hover:shadow-md transition-shadow">
       <div className="space-y-3">
+        {/* Question Header */}
         <div className="flex items-start">
           <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-2 flex-shrink-0">
             {index + 1}
           </span>
-          <p className="flex-1">{questionContent}</p>
+          <p className="flex-1">{question.question}</p>
         </div>
 
-        {question.options && question.options.length > 0 && (
-          <div className="ml-8 space-y-2">
-            {question.options.map((option, optIndex) => (
-              <div
-                key={optIndex}
-                className={`p-2 rounded-lg ${
-                  question.correctAnswer === option[0]
-                    ? "bg-green-100 border border-green-200"
-                    : "bg-gray-50"
-                }`}
-              >
-                {option}
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Options */}
+        <div className="ml-8 space-y-2">
+          {question.options.map((option, optIndex) => (
+            <div
+              key={optIndex}
+              className={`p-2 rounded-lg transition-all duration-300 ${
+                showAnswer && question.correctAnswer === option[0]
+                  ? "bg-green-100 border border-green-200 transform scale-102"
+                  : "bg-gray-50"
+              }`}
+            >
+              {option}
+            </div>
+          ))}
+        </div>
 
-        {question.correctAnswer && (
-          <div className="ml-8 mt-2">
+        {/* Show/Hide Answer Button */}
+        <div className="ml-8 mt-4">
+          <button
+            onClick={() => setShowAnswer(!showAnswer)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              showAnswer
+                ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
+          >
+            {showAnswer ? "Hide Answer" : "Show Answer"}
+          </button>
+        </div>
+
+        {/* Answer and Explanation with Animation */}
+        <div
+          className={`ml-8 mt-2 space-y-2 transition-all duration-300 overflow-hidden ${
+            showAnswer ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="transform transition-all duration-300 translate-y-0">
             <p className="text-sm text-green-600 font-medium">
               Correct Answer: {question.correctAnswer}
             </p>
+            {question.explanation && (
+              <div className="bg-gray-50 p-3 rounded-lg mt-2">
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Explanation:</span>{" "}
+                  {question.explanation}
+                </p>
+              </div>
+            )}
           </div>
-        )}
-
-        {question.explanation && (
-          <div className="ml-8 mt-2">
-            <p className="text-sm text-gray-600">
-              <span className="font-medium">Explanation:</span>{" "}
-              {question.explanation}
-            </p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
