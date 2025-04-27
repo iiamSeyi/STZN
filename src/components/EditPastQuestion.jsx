@@ -9,6 +9,11 @@ const EditPastQuestion = ({ question, onUpdate, onCancel, isLoading }) => {
     file: null,
   });
 
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1999 }, (_, i) =>
+    (currentYear - i).toString()
+  );
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({
@@ -46,10 +51,9 @@ const EditPastQuestion = ({ question, onUpdate, onCancel, isLoading }) => {
             required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Course
+            Course Name
           </label>
           <input
             type="text"
@@ -65,14 +69,20 @@ const EditPastQuestion = ({ question, onUpdate, onCancel, isLoading }) => {
           <label className="block text-sm font-medium text-gray-700">
             Year
           </label>
-          <input
-            type="text"
+          <select
             name="year"
             value={editForm.year}
             onChange={handleInputChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
-          />
+          >
+            <option value="">Select Year</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
