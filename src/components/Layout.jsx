@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import { useState, useEffect } from 'react';
+import Footer from './Footer'; // Import Footer component
 
 function Layout() {
   const [darkMode, setDarkMode] = useState(false);
@@ -19,6 +20,7 @@ function Layout() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }
