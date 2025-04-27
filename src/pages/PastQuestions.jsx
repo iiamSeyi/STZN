@@ -1,79 +1,210 @@
-import { useState, useEffect, useCallback } from 'react';
-import { queryDocuments } from '../lib/firebase/db-operations';
-import PastQuestionCard from '../components/PastQuestionCard';
-import FilterBar from '../components/FilterBar';
+// import { useState, useEffect, useCallback } from "react";
+// import { queryDocuments } from "../lib/firebase/db-operations";
+// import PastQuestionCard from "../components/PastQuestionCard";
+// import FilterBar from "../components/FilterBar";
+
+// function PastQuestions() {
+//   const [pastQuestions, setPastQuestions] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [filters, setFilters] = useState({
+//     course: "",
+//     year: "",
+//   });
+
+//   const fetchPastQuestions = useCallback(async (currentFilters) => {
+//     try {
+//       setLoading(true); // move setLoading inside here
+
+//       const conditions = Object.entries(currentFilters)
+//         .filter(([_, value]) => value && value.trim() !== "")
+//         .map(([field, value]) => [field, "==", value.trim()]); // use array style, not object
+
+//       const questions = await queryDocuments(
+//         "pastQuestions",
+//         conditions,
+//         "createdAt",
+//         "desc"
+//       );
+
+//       setPastQuestions(questions);
+//     } catch (error) {
+//       console.error("Error fetching past questions:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     fetchPastQuestions(filters); // on mount, fetch using initial filters
+//   }, []);
+
+//   const handleFilterChange = (field, value) => {
+//     setFilters((prev) => ({
+//       ...prev,
+//       [field]: value,
+//     }));
+//   };
+
+//   const applyFilters = () => {
+//     fetchPastQuestions(filters); // now it uses the latest filters directly
+//   };
+
+//   if (loading) {
+//     return <div className="text-center py-8">Loading...</div>;
+//   }
+
+//   return (
+//     <div className="container mx-auto px-4 py-8">
+//       <h1 className="text-3xl font-bold mb-6">All Past Questions</h1>
+
+//       <FilterBar
+//         filters={filters}
+//         onFilterChange={handleFilterChange}
+//         onApplyFilters={applyFilters}
+//       />
+
+//       {pastQuestions.length > 0 ? (
+//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {pastQuestions.map((question) => (
+//             <PastQuestionCard
+//               key={question.id}
+//               question={question}
+//               isOwner={false}
+//             />
+//           ))}
+//         </div>
+//       ) : (
+//         <div className="text-center py-8 text-gray-500">
+//           No past questions found that match the filters used.
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default PastQuestions;
+
+// src/components/PastQuestions.jsx
+import { useState, useEffect, useCallback } from "react";
+import { queryDocuments } from "../lib/firebase/db-operations";
+import PastQuestionCard from "../components/PastQuestionCard";
+import FilterBar from "../components/FilterBar";
 
 function PastQuestions() {
   const [pastQuestions, setPastQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    course: '',
-    year: '',
+  const [error, setError] = useState(null);
+  const [activeFilters, setActiveFilters] = useState({
+    course: "",
+    year: "",
+    title: "",
+    uploadDateStart: "",
+    uploadDateEnd: "",
   });
 
-  const fetchPastQuestions = useCallback(async () => {
+  const fetchPastQuestions = useCallback(async (filtersToApply) => {
     try {
-      // Build conditions as objects with field, operator, value
-      let conditions = [];
-      if (filters.course.trim()) {
-        conditions.push({ field: 'course', operator: '==', value: filters.course });
-      }
-      if (filters.year.trim()) {
-        conditions.push({ field: 'year', operator: '==', value: filters.year });
-      }
-      console.log('Conditions:', conditions); // Debugging
+      setLoading(true);
+      setError(null);
 
-      const questions = await queryDocuments('pastQuestions', conditions, 'uploadedAt', 'desc');
+      // Create conditions array only for non-empty values
+      const conditions = Object.entries(filtersToApply)
+        .filter(([_, value]) => value && value.trim() !== "")
+        .map(([field, value]) => ({
+          field,
+          operator: "==",
+          value: value.trim(),
+        }));
 
-      console.log('Fetched questions:', questions); // Debugging
+      console.log("Applying filters with conditions:", conditions);
+
+      const questions = await queryDocuments(
+        "pastQuestions",
+        conditions,
+        "createdAt",
+        "desc"
+      );
+
       setPastQuestions(questions);
     } catch (error) {
-      console.error('Error fetching past questions:', error);
+      console.error("Error fetching past questions:", error);
+      setError("Failed to fetch past questions. Please try again later.");
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, []);
 
+  // Initial fetch
   useEffect(() => {
-    fetchPastQuestions();
-  }, [fetchPastQuestions]);
+    fetchPastQuestions(activeFilters);
+  }, []);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target; // Destructure name and value from e.target
-    setFilters((prev) => ({
+  const handleFilterChange = (field, value) => {
+    setActiveFilters((prev) => ({
       ...prev,
-      [name]: value, // Dynamically update the filter field
+      [field]: value,
     }));
   };
 
-  const applyFilters = () => {
-    setLoading(true);
-    fetchPastQuestions();
+  const handleApplyFilters = () => {
+    fetchPastQuestions(activeFilters);
   };
 
-  if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-600">
+        <p>{error}</p>
+        <button
+          onClick={() => fetchPastQuestions(activeFilters)}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">All Past Questions</h1>
+      <h1 className="text-3xl font-bold mb-6">Past Questions</h1>
+
       <FilterBar
-        filters={filters}
+        filters={activeFilters}
         onFilterChange={handleFilterChange}
-        onApplyFilters={applyFilters}
+        onApplyFilters={handleApplyFilters}
       />
 
-      {pastQuestions.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pastQuestions.map((question) => (
-            <PastQuestionCard key={question.id} question={question} isOwner={false} />
-          ))}
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading past questions...</p>
         </div>
       ) : (
-        <div className="text-center py-8 text-gray-500">
-          No past questions found that match the filters used.
-        </div>
+        <>
+          {pastQuestions.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {pastQuestions.map((question) => (
+                <PastQuestionCard
+                  key={question.id}
+                  question={question}
+                  isOwner={false}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-500">
+                No past questions found that match the filters.
+              </p>
+              <button
+                onClick={() => handleClearFilters()}
+                className="mt-4 text-blue-500 hover:text-blue-600"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
