@@ -324,7 +324,7 @@ const FilterBar = ({ filters, onFilterChange, onApplyFilters }) => {
           <div className="mt-4 flex justify-end space-x-4">
             <button
               onClick={handleClearFilters}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors duration-200"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
             >
               Clear Filters
             </button>
