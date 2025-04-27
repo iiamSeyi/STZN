@@ -116,7 +116,7 @@ const Navigation = ({ darkMode, setDarkMode }) => {
                         id="menu-item-2"
                       >
                         <FiMessageSquare className="w-4 h-4 text-purple-500" />
-                        <span>Chat with AI</span>
+                        <span>Chat with STZN</span>
                       </Link>
                       <button
                         onClick={handleLogout}
